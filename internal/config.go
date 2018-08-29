@@ -12,6 +12,7 @@ type Config struct {
 	DestDSN     string                       `json:"dest"`
 	AlterIgnore map[string]*AlterIgnoreTable `json:"alter_ignore"`
 	Tables      []string                     `json:"tables"`
+	ExcludeTables []string					 `json:"excludeTables"`
 	Email       *EmailStruct                 `json:"email"`
 	ConfigPath  string
 	Sync        bool
@@ -46,6 +47,11 @@ func (cfg *Config) IsIgnoreField(table string, name string) bool {
 
 // CheckMatchTables check table is match
 func (cfg *Config) CheckMatchTables(name string) bool {
+	for _, excludeTableName := range cfg.ExcludeTables {
+		if simpleMatch(excludeTableName, name, "CheckExcludeMatchTables") {
+			return false
+		}
+	}
 	if len(cfg.Tables) == 0 {
 		return true
 	}
